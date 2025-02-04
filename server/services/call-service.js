@@ -6,6 +6,7 @@ const twilio = require("twilio");
 const { VoiceResponse } = require('twilio').twiml;
 const env = require("dotenv");
 const { relayConfig } = require('../bot/relay-config');
+const { systemPrompt } = require('../bot/prompt-config');
 
 env.config();
 
@@ -51,11 +52,18 @@ class CallService {
         const connect = twiml.connect();
         
         connect.conversationRelay({
-            url: process.env.WEBSOCKET_URL || `wss://${process.env.HOSTNAME}/call`,
-            sttProvider: relayConfig.sttProvider,
-            ttsProvider: relayConfig.ttsProvider,
-            ttsVoice: relayConfig.ttsVoice,
-            welcomeGreeting: "Hello! How can I help you today?"
+            url: process.env.WEBSOCKET_URL || `wss://${process.env.HOSTNAME}/relay`,
+            sttProvider: 'deepgram',
+            ttsProvider: 'google',
+            ttsVoice: 'en-US-Journey-D',
+            interruptible: "true",
+            endSilenceTimeoutMs: 1000,
+            speechEndThresholdMs: 500,
+            bargeinEnabled: true,
+            context: JSON.stringify({
+                systemPrompt: systemPrompt,
+                role: "assistant"
+            })
         });
 
         return twiml.toString();

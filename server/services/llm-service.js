@@ -3,7 +3,7 @@ const { OpenAI } = require("openai");
 const { systemPrompt } = require('../bot/prompt-config');
 
 class LLMService extends EventEmitter {
-  constructor(model = 'gpt-4') {
+  constructor(model = 'gpt-4o') {
     super();
     this.openai = new OpenAI({
       apiKey: process.env.OPENAI_API_KEY
@@ -15,6 +15,7 @@ class LLMService extends EventEmitter {
     }];
     
     this.model = model;
+    this.maxContextLength = 10;
     this.callInfo = {};
     this.abortController = null;
   }
@@ -28,14 +29,23 @@ class LLMService extends EventEmitter {
         content: prompt
       });
 
+      if (this.userContext.length > this.maxContextLength) {
+        this.userContext = [
+          this.userContext[0],
+          ...this.userContext.slice(-4)
+        ];
+      }
+
       const completion = await this.openai.chat.completions.create({
         model: this.model,
         messages: this.userContext,
         temperature: 0.7,
+        max_tokens: 150,
+        presence_penalty: 0.6,
+        frequency_penalty: 0.6,
       });
 
-      const response = completion.choices[0].message;
-      const responseText = response.content;
+      const responseText = completion.choices[0].message.content;
       
       this.userContext.push({
         role: 'assistant',
@@ -61,6 +71,13 @@ class LLMService extends EventEmitter {
 
   setCallInfo(key, value) {
     this.callInfo[key] = value;
+  }
+
+  clearContext() {
+    this.userContext = [{
+      role: 'system',
+      content: systemPrompt
+    }];
   }
 }
 
