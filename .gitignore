@@ -23,3 +23,4 @@ Thumbs.db
 
 # Ignore ngrok files
 ngrok/.env
+node_modules/
