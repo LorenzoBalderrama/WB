@@ -1,1 +1,25 @@
+# Ignore environment variable files
 .env
+.env.local
+.env.development
+.env.production
+.env.test
+*.env*
+
+# Ignore dependencies
+node_modules/
+npm-debug.log
+yarn-error.log
+pnpm-debug.log
+
+# Ignore build files
+dist/
+build/
+.out/
+
+# Ignore system files
+.DS_Store
+Thumbs.db
+
+# Ignore ngrok files
+ngrok/.env
