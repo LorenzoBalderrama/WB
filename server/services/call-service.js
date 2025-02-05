@@ -52,18 +52,45 @@ class CallService {
         const connect = twiml.connect();
         
         connect.conversationRelay({
+            // Base Configuration
             url: process.env.WEBSOCKET_URL || `wss://${process.env.HOSTNAME}/relay`,
+            
+            // Speech-to-Text Configuration
             sttProvider: 'deepgram',
+            interim: true,                // Enable faster processing
+            dualChannel: true,            // Better audio quality
+            enhancedModel: false,         // Faster processing
+            
+            // Text-to-Speech Configuration
             ttsProvider: 'google',
-            ttsVoice: 'en-US-Journey-D',
+            ttsVoice: 'en-US-Standard-B', // Standard voice for lower latency
+            
+            // Voice Activity Detection
+            vadMode: 'aggressive',        // Faster speech detection
+            vadLevel: 3,                  // Higher sensitivity
+            
+            // Timing and Response Settings
+            endSilenceTimeoutMs: 500,     // Reduced silence timeout
+            speechEndThresholdMs: 300,    // Faster speech end detection
+            postSpeechTimerMs: 500,       // Control post-speech silence
+            
+            // Interaction Settings
             interruptible: "true",
-            endSilenceTimeoutMs: 1000,
-            speechEndThresholdMs: 500,
             bargeinEnabled: true,
+            
+            // Context
             context: JSON.stringify({
                 systemPrompt: systemPrompt,
                 role: "assistant"
-            })
+            }),
+
+            // Multi-language Configuration
+            languages: ["en-US", "es-MX"],
+            sttLanguages: ["en", "es"],     
+            ttsVoices: {                   
+                "en-US": "en-US-Standard-B",
+                "es-MX": "es-MX-Standard-A"
+            },
         });
 
         return twiml.toString();

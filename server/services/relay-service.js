@@ -8,7 +8,7 @@ const { systemPrompt } = require('../bot/prompt-config');
 class RelayService {
     constructor(ws) {
         this.ws = ws;
-        this.llmService = new LLMService('gpt-4o');
+        this.llmService = new LLMService('gpt-4o-mini');
         this.isInitialized = false;
         this.context = null;
         this.isProcessing = false;
